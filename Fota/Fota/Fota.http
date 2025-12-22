@@ -1,0 +1,6 @@
+@Fota_HostAddress = http://localhost:5263
+
+GET {{Fota_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
