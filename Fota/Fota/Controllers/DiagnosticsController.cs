@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using SharedProjectDTOs.DiagnosticDTOs;
 using SharedProjectDTOs.DiagnosticDTOs.SharedProjectDTOs.Diagnostics;
-
+using Fota.DataLayer.Enum;
 namespace StaffAffairs.AWebAPI.Controllers
 {
     [ApiController]
@@ -109,7 +109,7 @@ namespace StaffAffairs.AWebAPI.Controllers
 
         // GET: api/Diagnostics/status/Open
         [HttpGet("status/{status}")]
-        public async Task<ActionResult<IEnumerable<DiagnosticListDto>>> GetDiagnosticsByStatus(string status)
+        public async Task<ActionResult<IEnumerable<DiagnosticListDto>>> GetDiagnosticsByStatus(DiagnosticStatus status)
         {
             try
             {
@@ -133,7 +133,7 @@ namespace StaffAffairs.AWebAPI.Controllers
 
         // GET: api/Diagnostics/priority/Critical
         [HttpGet("priority/{priority}")]
-        public async Task<ActionResult<IEnumerable<DiagnosticListDto>>> GetDiagnosticsByPriority(string priority)
+        public async Task<ActionResult<IEnumerable<DiagnosticListDto>>> GetDiagnosticsByPriority(DiagnosticPriority priority)
         {
             try
             {
@@ -314,7 +314,7 @@ namespace StaffAffairs.AWebAPI.Controllers
                     Priority = dto.Priority,
                     SubscriberId = dto.SubscriberId,
                     TopicId = dto.TopicId,
-                    Status = "Open",
+                    Status = DiagnosticStatus.Open,
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -346,14 +346,14 @@ namespace StaffAffairs.AWebAPI.Controllers
                 if (diagnostic == null)
                     return NotFound(new { message = $"Diagnostic with ID {id} not found" });
 
-                if (diagnostic.Status == "Closed")
+                if (diagnostic.Status == DiagnosticStatus.Closed)
                     return BadRequest(new { message = "Cannot update a closed diagnostic" });
 
                 if (!string.IsNullOrEmpty(dto.Title))
                     diagnostic.Title = dto.Title;
                 if (dto.Description != null)
                     diagnostic.Description = dto.Description;
-                if (!string.IsNullOrEmpty(dto.Priority))
+                if (dto.Priority==null)
                     diagnostic.Priority = dto.Priority;
                 if (dto.TopicId.HasValue)
                     diagnostic.TopicId = dto.TopicId;

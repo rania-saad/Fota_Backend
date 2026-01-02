@@ -31,8 +31,9 @@ namespace Fota.DataLayer.Enum
             Pending,
             Approved,
             Published,
-            Rejected
-        }
+            Rejected,
+            Received
+    }
         public enum BaseMessageType
         {
             Standard,
@@ -41,9 +42,11 @@ namespace Fota.DataLayer.Enum
             BugFix,
             Update,
             Feature,
-            Patch
+            Patch,
+            
 
-        }
+
+    }
 
         
     

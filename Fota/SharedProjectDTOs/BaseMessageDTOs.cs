@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fota.DataLayer.Enum;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,14 +8,14 @@ namespace SharedProjectDTOs.BaseMessages
     public class BaseMessageGetDto
     {
         public int Id { get; set; }
-        public string MessageType { get; set; } = "Standard";
+        public BaseMessageType MessageType { get; set; } = BaseMessageType.Standard;
         public string? Description { get; set; }
       //  public byte[]? HexFileContent { get; set; }
 
         public string? HexFileContent { get; set; }
         public string? HexFileName { get; set; }
         public string? Version { get; set; }
-        public string Status { get; set; } = "Draft";
+        public BaseMessageStatus Status { get; set; } = BaseMessageStatus.Draft;
 
         public DateTime? ApprovedAt { get; set; }
         public DateTime? PublishedAt { get; set; }
@@ -41,7 +42,7 @@ namespace SharedProjectDTOs.BaseMessages
         public string? HexFileName { get; set; }
         public string? Version { get; set; }
 
-        public string Status { get; set; } = "Draft";
+        public BaseMessageStatus Status { get; set; } = BaseMessageStatus.Draft;
         public string? TopicName { get; set; }
         public string? UploaderName { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -50,7 +51,7 @@ namespace SharedProjectDTOs.BaseMessages
 
     public class BaseMessageCreateDto
     {
-        public string MessageType { get; set; } = "Standard";
+        public BaseMessageType MessageType { get; set; } = BaseMessageType.Standard;
         public string? Description { get; set; }
         //public byte[]? HexFileContent { get; set; }
         public string? HexFileContent { get; set; }
@@ -58,14 +59,14 @@ namespace SharedProjectDTOs.BaseMessages
         public string? HexFileName { get; set; }
         public string? Version { get; set; }
 
-        public string Status { get; set; } 
+        public BaseMessageStatus Status { get; set; } 
 
         public int TopicId { get; set; }
         public int UploaderId { get; set; }
     }
     public class BaseMessageUpdateDto
     {
-        public string? MessageType { get; set; }
+        public BaseMessageType MessageType { get; set; }
         public string? Description { get; set; }
         public string? HexFileContent { get; set; }
 
@@ -88,9 +89,9 @@ namespace SharedProjectDTOs.BaseMessages
     public class BaseMessageWithFileDto
     {
         public int Id { get; set; }
-        public string MessageType { get; set; } = "Standard";
+        public BaseMessageType MessageType { get; set; } = BaseMessageType.Standard;
         public string? Description { get; set; }
-        public string Status { get; set; } = "Draft";
+        public BaseMessageStatus Status { get; set; } = BaseMessageStatus.Draft;
         public string? TopicName { get; set; }
         public string? UploaderName { get; set; }
         public DateTime CreatedAt { get; set; }

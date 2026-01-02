@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using MQTTnet;
 using System.Collections.Concurrent;
 using MQTTnet.Client;
-
+using Fota.DataLayer.Enum;
 namespace Fota.Services
 {
     /// <summary>
@@ -255,12 +255,12 @@ namespace Fota.Services
                 // ✅ Create new BaseMessage with assembled Base64 string
                 var baseMessage = new BaseMessage
                 {
-                    MessageType = "Standard",
+                    MessageType = BaseMessageType.Standard,
                     Description = $"Message received from topic {topicName}",
                     HexFileContent = completeBase64Content, // ✅ احفظ الـ Base64 string مباشرة
                     HexFileName = $"received_{topicName}_{DateTime.UtcNow:yyyyMMddHHmmss}.hex",
                     Version = "1.0",
-                    Status = "Received",
+                    Status = BaseMessageStatus.Published,
                     TopicId = topic.Id,
                     UploaderId = 1,
                     CreatedAt = DateTime.UtcNow,

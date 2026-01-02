@@ -4,6 +4,8 @@ using System.Text;
 
 namespace SharedProjectDTOs.DiagnosticDTOs
 {
+    using Fota.DataLayer.Enum;
+    using Fota.DataLayer.Models;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -22,7 +24,7 @@ namespace SharedProjectDTOs.DiagnosticDTOs
 
             [Required]
             [MaxLength(50)]
-            public string Priority { get; set; } = "Medium";
+            public DiagnosticPriority Priority { get; set; } = DiagnosticPriority.Medium;
 
             [Required]
             public int SubscriberId { get; set; }
@@ -36,8 +38,8 @@ namespace SharedProjectDTOs.DiagnosticDTOs
             public int Id { get; set; }
             public string Title { get; set; } = null!;
             public string? Description { get; set; }
-            public string Priority { get; set; } = null!;
-            public string Status { get; set; } = null!;
+            public DiagnosticPriority Priority { get; set; }
+            public DiagnosticStatus Status { get; set; } 
             public DateTime? ResolvedAt { get; set; }
             public DateTime? ClosedAt { get; set; }
             public int SubscriberId { get; set; }
@@ -58,8 +60,8 @@ namespace SharedProjectDTOs.DiagnosticDTOs
         {
             public int Id { get; set; }
             public string Title { get; set; } = null!;
-            public string Priority { get; set; } = null!;
-            public string Status { get; set; } = null!;
+            public DiagnosticPriority Priority { get; set; } 
+            public DiagnosticStatus Status { get; set; }
             public string? SubscriberName { get; set; }
             public string? TopicName { get; set; }
             public string? AssignedToDeveloperName { get; set; }
@@ -76,7 +78,7 @@ namespace SharedProjectDTOs.DiagnosticDTOs
             public string? Description { get; set; }
 
             [MaxLength(50)]
-            public string? Priority { get; set; }
+            public DiagnosticPriority Priority { get; set; }
 
             public int? TopicId { get; set; }
         }
@@ -96,7 +98,7 @@ namespace SharedProjectDTOs.DiagnosticDTOs
         {
             [Required]
             [MaxLength(50)]
-            public string Status { get; set; } = null!;
+            public DiagnosticStatus Status { get; set; } 
         }
     }
 }
