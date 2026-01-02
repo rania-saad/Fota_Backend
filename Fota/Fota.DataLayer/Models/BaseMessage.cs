@@ -1,6 +1,8 @@
-﻿using Fota.DataLayer.Models;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Fota.DataLayer.Enum;
+using Fota.DataLayer.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using  Fota.DataLayer.Enum;
 
 namespace Fota.Models
 {
@@ -10,7 +12,7 @@ namespace Fota.Models
         public int Id { get; set; }
 
         [MaxLength(50)]
-        public string MessageType { get; set; } = "Standard"; // Standard, Diagnostic, Broadcast
+        public BaseMessageType MessageType { get; set; }  // Standard, Diagnostic, Broadcast
 
         [MaxLength(2000)]
         public string? Description { get; set; }
@@ -27,7 +29,7 @@ namespace Fota.Models
         public string? Version { get; set; }
 
         [MaxLength(50)]
-        public string Status { get; set; } = "Pending"; // Draft, Pending, Approved, Published, Rejected
+        public BaseMessageStatus Status { get; set; }  // Draft, Pending, Approved, Published, Rejected
 
         public DateTime? ApprovedAt { get; set; }
         public DateTime? PublishedAt { get; set; }

@@ -3,6 +3,7 @@ using Fota.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Fota.DataLayer.Enum;
 
 namespace Fota.DataLayer.DBContext
 {
@@ -11,7 +12,7 @@ namespace Fota.DataLayer.DBContext
         public FOTADbContext(DbContextOptions<FOTADbContext> options)
             : base(options) { }
 
-        // DbSets
+        // DbSetsa
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Developer> Developers { get; set; }
         public DbSet<Team> Teams { get; set; }
@@ -322,11 +323,11 @@ namespace Fota.DataLayer.DBContext
                 new BaseMessage
                 {
                     Id = 1,
-                    MessageType = "Standard",
+                    MessageType = BaseMessageType.Standard,
                     Description = "ECU Firmware Update v2.3.1 - Performance improvements",
                     HexFileName = "ecu_v2.3.1.hex",
                     Version = "2.3.1",
-                    Status = "Published",
+                    Status = BaseMessageStatus.Published,
                     TopicId = 1,
                     UploaderId = 1,
                     PublisherId = 1,
@@ -337,11 +338,11 @@ namespace Fota.DataLayer.DBContext
                 new BaseMessage
                 {
                     Id = 2,
-                    MessageType = "Standard",
+                    MessageType = BaseMessageType.Standard,
                     Description = "BMS Critical Security Patch v1.8.2",
                     HexFileName = "bms_v1.8.2_security.hex",
                     Version = "1.8.2",
-                    Status = "Approved",
+                    Status = BaseMessageStatus.Approved,
                     TopicId = 2,
                     UploaderId = 2,
                     ApprovedAt = new DateTime(2024, 5, 15, 11, 0, 0),
@@ -373,8 +374,8 @@ namespace Fota.DataLayer.DBContext
                     Id = 1,
                     Title = "Battery Temperature Warning",
                     Description = "Battery pack temperature exceeding normal range in test vehicle VIN:ABC123",
-                    Priority = "High",
-                    Status = "InProgress",
+                    Priority = DiagnosticPriority.High,
+                    Status = DiagnosticStatus.InProgress,
                     TopicId = 2,
                     SubscriberId = 2,
                     AssignedByAdminId = 1,

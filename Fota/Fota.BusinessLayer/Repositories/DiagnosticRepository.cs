@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Fota.BusinessLayer.Interfaces;
+using Fota.DataLayer.DBContext;
+using Fota.DataLayer.Enum;
+using Fota.DataLayer.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Fota.BusinessLayer.Interfaces;
-using Fota.DataLayer.DBContext;
-using Fota.DataLayer.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Fota.BusinessLayer.Repositories
 {
@@ -46,7 +47,7 @@ namespace Fota.BusinessLayer.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Diagnostic>> GetByStatusAsync(string status)
+        public async Task<IEnumerable<Diagnostic>> GetByStatusAsync(DiagnosticStatus status)
         {
             return await _dbSet
                 .Include(d => d.Subscriber)
@@ -57,7 +58,7 @@ namespace Fota.BusinessLayer.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Diagnostic>> GetByPriorityAsync(string priority)
+        public async Task<IEnumerable<Diagnostic>> GetByPriorityAsync(DiagnosticPriority priority)
         {
             return await _dbSet
                 .Include(d => d.Subscriber)
@@ -106,8 +107,8 @@ namespace Fota.BusinessLayer.Repositories
                 .Include(d => d.Subscriber)
                 .Include(d => d.Topic)
                 .Include(d => d.AssignedToDeveloper)
-                .Where(d => d.Status == "Open" || d.Status == "InProgress")
-                .OrderBy(d => d.Priority == "Critical" ? 1 : d.Priority == "High" ? 2 : d.Priority == "Medium" ? 3 : 4)
+                .Where(d => d.Status == DiagnosticStatus.Open || d.Status == DiagnosticStatus.InProgress)
+                .OrderBy(d => d.Priority == DiagnosticPriority.Critical ? 1 : d.Priority == DiagnosticPriority.High ? 2 : d.Priority == DiagnosticPriority.Medium ? 3 : 4)
                 .ThenByDescending(d => d.CreatedAt)
                 .ToListAsync();
         }
@@ -117,8 +118,8 @@ namespace Fota.BusinessLayer.Repositories
             return await _dbSet
                 .Include(d => d.Subscriber)
                 .Include(d => d.Topic)
-                .Where(d => d.AssignedToDeveloperId == null && (d.Status == "Open" || d.Status == "InProgress"))
-                .OrderBy(d => d.Priority == "Critical" ? 1 : d.Priority == "High" ? 2 : d.Priority == "Medium" ? 3 : 4)
+                .Where(d => d.AssignedToDeveloperId == null && (d.Status == DiagnosticStatus.Open|| d.Status == DiagnosticStatus.InProgress))
+                .OrderBy(d => d.Priority == DiagnosticPriority.Critical ? 1 : d.Priority == DiagnosticPriority.High ? 2 : d.Priority == DiagnosticPriority.Medium ? 3 : 4)
                 .ThenByDescending(d => d.CreatedAt)
                 .ToListAsync();
         }
@@ -126,19 +127,19 @@ namespace Fota.BusinessLayer.Repositories
         public async Task<Diagnostic?> AssignToDeveloperAsync(int diagnosticId, int developerId, int adminId)
         {
             var diagnostic = await GetByIdAsync(diagnosticId);
-            if (diagnostic == null || diagnostic.Status == "Closed")
+            if (diagnostic == null || diagnostic.Status == DiagnosticStatus.Closed)
                 return null;
 
             diagnostic.AssignedToDeveloperId = developerId;
             diagnostic.AssignedByAdminId = adminId;
-            diagnostic.Status = "InProgress";
+            diagnostic.Status = DiagnosticStatus.InProgress;
             diagnostic.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
             return diagnostic;
         }
 
-        public async Task<Diagnostic?> UpdateStatusAsync(int diagnosticId, string status)
+        public async Task<Diagnostic?> UpdateStatusAsync(int diagnosticId, DiagnosticStatus status)
         {
             var diagnostic = await GetByIdAsync(diagnosticId);
             if (diagnostic == null)
@@ -147,11 +148,11 @@ namespace Fota.BusinessLayer.Repositories
             diagnostic.Status = status;
             diagnostic.UpdatedAt = DateTime.UtcNow;
 
-            if (status == "Resolved" && diagnostic.ResolvedAt == null)
+            if (status == DiagnosticStatus.Resolved && diagnostic.ResolvedAt == null)
             {
                 diagnostic.ResolvedAt = DateTime.UtcNow;
             }
-            else if (status == "Closed" && diagnostic.ClosedAt == null)
+            else if (status == DiagnosticStatus.Closed && diagnostic.ClosedAt == null)
             {
                 diagnostic.ClosedAt = DateTime.UtcNow;
             }
@@ -163,10 +164,10 @@ namespace Fota.BusinessLayer.Repositories
         public async Task<Diagnostic?> ResolveDiagnosticAsync(int diagnosticId)
         {
             var diagnostic = await GetByIdAsync(diagnosticId);
-            if (diagnostic == null || diagnostic.Status == "Closed")
+            if (diagnostic == null || diagnostic.Status == DiagnosticStatus.Closed)
                 return null;
 
-            diagnostic.Status = "Resolved";
+            diagnostic.Status = DiagnosticStatus.Resolved;
             diagnostic.ResolvedAt = DateTime.UtcNow;
             diagnostic.UpdatedAt = DateTime.UtcNow;
 
@@ -180,7 +181,7 @@ namespace Fota.BusinessLayer.Repositories
             if (diagnostic == null)
                 return null;
 
-            diagnostic.Status = "Closed";
+            diagnostic.Status = DiagnosticStatus.Closed;
             diagnostic.ClosedAt = DateTime.UtcNow;
             diagnostic.UpdatedAt = DateTime.UtcNow;
 

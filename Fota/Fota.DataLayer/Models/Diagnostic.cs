@@ -1,8 +1,9 @@
-﻿using Fota.Models;
+﻿using Fota.DataLayer.Enum;
+using Fota.Models;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,10 +23,10 @@ namespace Fota.DataLayer.Models
         public string? Description { get; set; }
 
         [MaxLength(50)]
-        public string Priority { get; set; } = "Medium"; // Low, Medium, High, Critical
+        public DiagnosticPriority Priority { get; set; } // Low, Medium, High, Critical
 
         [MaxLength(50)]
-        public string Status { get; set; } = "Open"; // Open, InProgress, Resolved, Closed
+        public DiagnosticStatus Status { get; set; } // Open, InProgress, Resolved, Closed
 
         public DateTime? ResolvedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
