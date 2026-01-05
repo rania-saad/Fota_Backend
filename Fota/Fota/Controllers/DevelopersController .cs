@@ -171,5 +171,48 @@ namespace StaffAffairs.AWebAPI.Controllers
 
                 return NoContent();
             }
+
+
+        [HttpGet("{id}/teams")]
+        public async Task<ActionResult<IEnumerable<object>>> GetDeveloperTeams(int id)
+        {
+            // First check if developer exists
+            var developer = await _developerRepository.GetByIdAsync(id);
+            if (developer == null)
+            {
+                return NotFound(new { message = $"Developer with ID {id} not found." });
+            }
+
+            // Get all teams the developer belongs to
+            var teams = await _developerRepository.GetTeamsByDeveloperIdAsync(id);
+
+            // Transform the data to return a clean response
+            var teamDtos = teams.Select(team => new
+            {
+                id = team.Id,
+                name = team.Name,
+                description = team.Description,
+                isActive = team.IsActive,
+                memberCount = team.TeamDevelopers?.Count(td => td.IsActive) ?? 0,
+                topicCount = team.TeamTopics?.Count ?? 0,
+                teamLead = team.Lead != null ? new
+                {
+                    id = team.Lead.Id,
+                    name = team.Lead.Name,
+                    email = team.Lead.Email
+                } : null,
+                assignedTopics = team.TeamTopics?.Select(tt => tt.Topic?.Name).ToList() ?? new List<string>(),
+                createdAt = team.CreatedAt,
+                updatedAt = team.UpdatedAt
+            }).ToList();
+
+            return Ok(new
+            {
+                developerId = id,
+                developerName = developer.Name,
+                totalTeams = teamDtos.Count,
+                teams = teamDtos
+            });
         }
+    }
     }

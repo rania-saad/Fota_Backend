@@ -22,5 +22,6 @@ namespace Fota.BusinessLayer.Interfaces
         Task<Diagnostic?> ResolveDiagnosticAsync(int diagnosticId);
         Task<Diagnostic?> CloseDiagnosticAsync(int diagnosticId);
         Task<IEnumerable<Diagnostic>> GetByDateRangeAsync(DateTime startDate, DateTime endDate);
+        Task<int> GetTotalDiagnosticsCountAsync();
     }
 }

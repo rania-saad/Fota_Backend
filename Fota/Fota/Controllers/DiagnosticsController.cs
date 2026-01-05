@@ -346,7 +346,7 @@ namespace StaffAffairs.AWebAPI.Controllers
                 if (diagnostic == null)
                     return NotFound(new { message = $"Diagnostic with ID {id} not found" });
 
-                if (diagnostic.Status == DiagnosticStatus.Closed)
+                if (diagnostic.Status == DiagnosticStatus.Resolved)
                     return BadRequest(new { message = "Cannot update a closed diagnostic" });
 
                 if (!string.IsNullOrEmpty(dto.Title))
@@ -510,6 +510,14 @@ namespace StaffAffairs.AWebAPI.Controllers
                     }
                 );
             }
+        }
+
+        // GET: api/Diagnostics/TotalMessages
+        [HttpGet("TotaDiagnostics")]
+        public async Task<IActionResult> GetTotalDiagnostics()
+        {
+            var totalMessages = await _diagnosticRepository.GetTotalDiagnosticsCountAsync();
+            return Ok(new { TotalDiagnostics = totalMessages });
         }
     }
 }

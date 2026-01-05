@@ -190,18 +190,16 @@ namespace Fota.DataLayer.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
-                    b.Property<string>("Priority")
-                        .IsRequired()
+                    b.Property<int>("Priority")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("ResolvedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
+                    b.Property<int>("Status")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("int");
 
                     b.Property<int>("SubscriberId")
                         .HasColumnType("int");
@@ -240,8 +238,8 @@ namespace Fota.DataLayer.Migrations
                             AssignedToDeveloperId = 2,
                             CreatedAt = new DateTime(2024, 5, 20, 8, 30, 0, 0, DateTimeKind.Unspecified),
                             Description = "Battery pack temperature exceeding normal range in test vehicle VIN:ABC123",
-                            Priority = "High",
-                            Status = "InProgress",
+                            Priority = 0,
+                            Status = 1,
                             SubscriberId = 2,
                             Title = "Battery Temperature Warning",
                             TopicId = 2
@@ -685,10 +683,9 @@ namespace Fota.DataLayer.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("MessageType")
-                        .IsRequired()
+                    b.Property<int>("MessageType")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("PublishedAt")
                         .HasColumnType("datetime2");
@@ -703,10 +700,9 @@ namespace Fota.DataLayer.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
+                    b.Property<int>("Status")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("int");
 
                     b.Property<int>("TopicId")
                         .HasColumnType("int");
@@ -742,10 +738,10 @@ namespace Fota.DataLayer.Migrations
                             Description = "ECU Firmware Update v2.3.1 - Performance improvements",
                             HexFileName = "ecu_v2.3.1.hex",
                             IsDeleted = false,
-                            MessageType = "Standard",
+                            MessageType = 0,
                             PublishedAt = new DateTime(2024, 5, 10, 14, 30, 0, 0, DateTimeKind.Unspecified),
                             PublisherId = 1,
-                            Status = "Published",
+                            Status = 3,
                             TopicId = 1,
                             UploaderId = 1,
                             Version = "2.3.1"
@@ -758,8 +754,8 @@ namespace Fota.DataLayer.Migrations
                             Description = "BMS Critical Security Patch v1.8.2",
                             HexFileName = "bms_v1.8.2_security.hex",
                             IsDeleted = false,
-                            MessageType = "Standard",
-                            Status = "Approved",
+                            MessageType = 0,
+                            Status = 2,
                             TopicId = 2,
                             UploaderId = 2,
                             Version = "1.8.2"

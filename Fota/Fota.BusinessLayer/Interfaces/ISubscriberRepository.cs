@@ -14,5 +14,6 @@ namespace Fota.BusinessLayer.Interfaces
         Task<IEnumerable<Subscriber>> GetByTopicAsync(int topicId);
         Task<IEnumerable<Subscriber>> GetSubscribersWithDiagnosticsAsync();
         Task<IEnumerable<Subscriber>> GetSubscribersWithDeliveriesAsync();
+        Task<int> GetTotalCountAsync();
     }
 }

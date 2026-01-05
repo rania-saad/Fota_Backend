@@ -117,5 +117,10 @@ namespace Fota.BusinessLayer.Repositories
                 .Include(t => t.TeamTopics)
                 .ToListAsync();
         }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            return await _dbSet.CountAsync();
+        }
     }
 }

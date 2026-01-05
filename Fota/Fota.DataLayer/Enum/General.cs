@@ -14,7 +14,6 @@ namespace Fota.DataLayer.Enum
 
             Open,
             InProgress,
-            Closed,
             Resolved
         }
         public enum DiagnosticPriority

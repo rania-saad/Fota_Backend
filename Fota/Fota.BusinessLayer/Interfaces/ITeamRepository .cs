@@ -10,5 +10,6 @@ namespace Fota.BusinessLayer.Interfaces
     {
         Task<IEnumerable<Team>> GetActiveTeamsAsync();
         Task<IEnumerable<Team>> GetByLeadAsync(int leadId);
+        Task<int> GetTotalCountAsync();
     }
 }

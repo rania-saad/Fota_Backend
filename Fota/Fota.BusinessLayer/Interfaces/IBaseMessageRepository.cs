@@ -22,7 +22,7 @@ namespace Fota.BusinessLayer.Interfaces
         Task<BaseMessage?> ApproveMessageAsync(int messageId, int approvedById);
         Task<BaseMessage?> RejectMessageAsync(int messageId, string rejectionReason);
         Task<BaseMessage?> PublishMessageAsync(int messageId, int publisherId);
-
+        Task<int> GetTotalMessagesCountAsync();
 
     }
 

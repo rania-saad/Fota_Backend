@@ -1,11 +1,12 @@
 ﻿
 
+using AutoMapper;
 using Fota.BusinessLayer.Interfaces;
+using Fota.BusinessLayer.Repositories;
+using Fota.DataLayer.Enum;
 using Fota.Models;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using SharedProjectDTOs.BaseMessages;
-using Fota.DataLayer.Enum;
 
 namespace StaffAffairs.AWebAPI.Controllers
 {
@@ -482,6 +483,13 @@ namespace StaffAffairs.AWebAPI.Controllers
                         Detail = "An unexpected error occurred while processing your request"
                     });
             }
+        }
+
+        [HttpGet("TotalMessages")]
+        public async Task<IActionResult> GetTotalMessages()
+        {
+            var totalMessages = await _baseMessageRepository.GetTotalMessagesCountAsync();
+            return Ok(new { TotalMessages = totalMessages });
         }
     }
 }

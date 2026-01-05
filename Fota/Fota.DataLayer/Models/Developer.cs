@@ -21,7 +21,7 @@ namespace Fota.Models
         [MaxLength(20)]
         public string? PhoneNumber { get; set; }
 
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; } = true; 
 
         // Navigation Properties
         public virtual ICollection<BaseMessage> UploadedMessages { get; set; } = new List<BaseMessage>();

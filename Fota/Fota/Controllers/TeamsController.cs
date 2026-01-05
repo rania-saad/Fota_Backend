@@ -229,5 +229,12 @@ namespace Fota.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("TotalTeams")]
+        public async Task<IActionResult> GetTotalTeams()
+        {
+            var totalMessages = await _teamRepository.GetTotalCountAsync();
+            return Ok(new { TotalTeams = totalMessages });
+        }
     }
 }

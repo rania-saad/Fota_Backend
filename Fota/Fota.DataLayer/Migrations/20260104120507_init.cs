@@ -34,11 +34,53 @@ namespace Fota.DataLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Developers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    IdentityUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
@@ -94,6 +136,106 @@ namespace Fota.DataLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserLogins",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Teams",
                 columns: table => new
                 {
@@ -130,12 +272,12 @@ namespace Fota.DataLayer.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MessageType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    MessageType = table.Column<int>(type: "int", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    HexFileContent = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    HexFileContent = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HexFileName = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Version = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Status = table.Column<int>(type: "int", maxLength: 50, nullable: false),
                     ApprovedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PublishedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RejectedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -178,8 +320,8 @@ namespace Fota.DataLayer.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    Priority = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Priority = table.Column<int>(type: "int", maxLength: 50, nullable: false),
+                    Status = table.Column<int>(type: "int", maxLength: 50, nullable: false),
                     ResolvedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ClosedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     SubscriberId = table.Column<int>(type: "int", nullable: false),
@@ -389,12 +531,12 @@ namespace Fota.DataLayer.Migrations
 
             migrationBuilder.InsertData(
                 table: "Developers",
-                columns: new[] { "Id", "CreatedAt", "CreatedById", "Email", "IsActive", "Name", "PhoneNumber", "UpdatedAt", "UpdatedById" },
+                columns: new[] { "Id", "CreatedAt", "CreatedById", "Email", "IdentityUserId", "IsActive", "Name", "PhoneNumber", "UpdatedAt", "UpdatedById" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 2, 1, 9, 0, 0, 0, DateTimeKind.Unspecified), null, "mohamed.ali@fotasystem.com", true, "Mohamed Ali", "+201234567892", null, null },
-                    { 2, new DateTime(2024, 2, 1, 9, 0, 0, 0, DateTimeKind.Unspecified), null, "fatima.nour@fotasystem.com", true, "Fatima Nour", "+201234567893", null, null },
-                    { 3, new DateTime(2024, 2, 5, 9, 0, 0, 0, DateTimeKind.Unspecified), null, "omar.khaled@fotasystem.com", true, "Omar Khaled", "+201234567894", null, null }
+                    { 1, new DateTime(2024, 2, 1, 9, 0, 0, 0, DateTimeKind.Unspecified), null, "mohamed.ali@fotasystem.com", null, true, "Mohamed Ali", "+201234567892", null, null },
+                    { 2, new DateTime(2024, 2, 1, 9, 0, 0, 0, DateTimeKind.Unspecified), null, "fatima.nour@fotasystem.com", null, true, "Fatima Nour", "+201234567893", null, null },
+                    { 3, new DateTime(2024, 2, 5, 9, 0, 0, 0, DateTimeKind.Unspecified), null, "omar.khaled@fotasystem.com", null, true, "Omar Khaled", "+201234567894", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -421,14 +563,14 @@ namespace Fota.DataLayer.Migrations
                 columns: new[] { "Id", "ApprovedAt", "ApprovedById", "CreatedAt", "CreatedById", "Description", "HexFileContent", "HexFileName", "IsDeleted", "MessageType", "PublishedAt", "PublisherId", "RejectedAt", "RejectionReason", "Status", "TopicId", "UpdatedAt", "UpdatedById", "UploaderId", "Version" },
                 values: new object[,]
                 {
-                    { 1, null, null, new DateTime(2024, 5, 10, 10, 0, 0, 0, DateTimeKind.Unspecified), null, "ECU Firmware Update v2.3.1 - Performance improvements", null, "ecu_v2.3.1.hex", false, "Standard", new DateTime(2024, 5, 10, 14, 30, 0, 0, DateTimeKind.Unspecified), 1, null, null, "Published", 1, null, null, 1, "2.3.1" },
-                    { 2, new DateTime(2024, 5, 15, 11, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2024, 5, 15, 9, 0, 0, 0, DateTimeKind.Unspecified), null, "BMS Critical Security Patch v1.8.2", null, "bms_v1.8.2_security.hex", false, "Standard", null, null, null, null, "Approved", 2, null, null, 2, "1.8.2" }
+                    { 1, null, null, new DateTime(2024, 5, 10, 10, 0, 0, 0, DateTimeKind.Unspecified), null, "ECU Firmware Update v2.3.1 - Performance improvements", null, "ecu_v2.3.1.hex", false, 0, new DateTime(2024, 5, 10, 14, 30, 0, 0, DateTimeKind.Unspecified), 1, null, null, 3, 1, null, null, 1, "2.3.1" },
+                    { 2, new DateTime(2024, 5, 15, 11, 0, 0, 0, DateTimeKind.Unspecified), null, new DateTime(2024, 5, 15, 9, 0, 0, 0, DateTimeKind.Unspecified), null, "BMS Critical Security Patch v1.8.2", null, "bms_v1.8.2_security.hex", false, 0, null, null, null, null, 2, 2, null, null, 2, "1.8.2" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Diagnostics",
                 columns: new[] { "Id", "AssignedByAdminId", "AssignedToDeveloperId", "ClosedAt", "CreatedAt", "CreatedById", "Description", "Priority", "ResolvedAt", "Status", "SubscriberId", "Title", "TopicId", "UpdatedAt", "UpdatedById" },
-                values: new object[] { 1, 1, 2, null, new DateTime(2024, 5, 20, 8, 30, 0, 0, DateTimeKind.Unspecified), null, "Battery pack temperature exceeding normal range in test vehicle VIN:ABC123", "High", null, "InProgress", 2, "Battery Temperature Warning", 2, null, null });
+                values: new object[] { 1, 1, 2, null, new DateTime(2024, 5, 20, 8, 30, 0, 0, DateTimeKind.Unspecified), null, "Battery pack temperature exceeding normal range in test vehicle VIN:ABC123", 0, null, 1, 2, "Battery Temperature Warning", 2, null, null });
 
             migrationBuilder.InsertData(
                 table: "Teams",
@@ -478,6 +620,45 @@ namespace Fota.DataLayer.Migrations
                 column: "Email",
                 unique: true,
                 filter: "[Email] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "AspNetUsers",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "AspNetUsers",
+                column: "NormalizedUserName",
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BaseMessages_PublisherId",
@@ -599,6 +780,21 @@ namespace Fota.DataLayer.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AspNetRoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
                 name: "DiagnosticSolutions");
 
             migrationBuilder.DropTable(
@@ -612,6 +808,12 @@ namespace Fota.DataLayer.Migrations
 
             migrationBuilder.DropTable(
                 name: "TopicSubscribers");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Diagnostics");

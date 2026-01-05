@@ -65,6 +65,22 @@ using Microsoft.EntityFrameworkCore;
                 .Include(d => d.LeadingTeams)
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
+
+        public async Task<IEnumerable<Team>> GetTeamsByDeveloperIdAsync(int developerId)
+        {
+            return await _context.TeamDevelopers
+                .Where(td => td.DeveloperId == developerId && td.IsActive)
+                .Include(td => td.Team)
+                    .ThenInclude(t => t.Lead)
+                .Include(td => td.Team)
+                    .ThenInclude(t => t.TeamTopics)
+                .Include(td => td.Team)
+                    .ThenInclude(t => t.TeamDevelopers)
+                        .ThenInclude(td => td.Developer)
+                .Select(td => td.Team)
+                .Where(t => t.IsActive)
+                .ToListAsync();
+        }
     }
 }
 

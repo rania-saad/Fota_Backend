@@ -248,5 +248,9 @@ namespace Fota.BusinessLayer.Repositories
             await _context.SaveChangesAsync();
             return entity;
         }
+        public async Task<int> GetTotalMessagesCountAsync()
+        {
+            return await _dbSet.CountAsync();
+        }
     }
 }

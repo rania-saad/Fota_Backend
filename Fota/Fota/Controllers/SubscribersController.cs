@@ -1,8 +1,9 @@
 ﻿
+using AutoMapper;
 using Fota.BusinessLayer.Interfaces;
+using Fota.BusinessLayer.Repositories;
 using Fota.Models;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using SharedProjectDTOs.Subscribers;
 
 namespace Fota.AWebAPI.Controllers
@@ -249,6 +250,16 @@ namespace Fota.AWebAPI.Controllers
                     }
                 );
             }
+
+           
+        }
+
+
+        [HttpGet("TotalSubscribers")]
+        public async Task<IActionResult> GetTotalSubscribers()
+        {
+            var totalMessages = await _subscriberRepository.GetTotalCountAsync();
+            return Ok(new { TotalSubscribers = totalMessages });
         }
     }
 }

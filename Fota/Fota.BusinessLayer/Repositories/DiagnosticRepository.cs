@@ -127,7 +127,7 @@ namespace Fota.BusinessLayer.Repositories
         public async Task<Diagnostic?> AssignToDeveloperAsync(int diagnosticId, int developerId, int adminId)
         {
             var diagnostic = await GetByIdAsync(diagnosticId);
-            if (diagnostic == null || diagnostic.Status == DiagnosticStatus.Closed)
+            if (diagnostic == null || diagnostic.Status == DiagnosticStatus.Resolved)
                 return null;
 
             diagnostic.AssignedToDeveloperId = developerId;
@@ -152,7 +152,7 @@ namespace Fota.BusinessLayer.Repositories
             {
                 diagnostic.ResolvedAt = DateTime.UtcNow;
             }
-            else if (status == DiagnosticStatus.Closed && diagnostic.ClosedAt == null)
+            else if (status == DiagnosticStatus.Resolved && diagnostic.ClosedAt == null)
             {
                 diagnostic.ClosedAt = DateTime.UtcNow;
             }
@@ -164,7 +164,7 @@ namespace Fota.BusinessLayer.Repositories
         public async Task<Diagnostic?> ResolveDiagnosticAsync(int diagnosticId)
         {
             var diagnostic = await GetByIdAsync(diagnosticId);
-            if (diagnostic == null || diagnostic.Status == DiagnosticStatus.Closed)
+            if (diagnostic == null || diagnostic.Status == DiagnosticStatus.Resolved)
                 return null;
 
             diagnostic.Status = DiagnosticStatus.Resolved;
@@ -181,7 +181,7 @@ namespace Fota.BusinessLayer.Repositories
             if (diagnostic == null)
                 return null;
 
-            diagnostic.Status = DiagnosticStatus.Closed;
+            diagnostic.Status = DiagnosticStatus.Resolved;
             diagnostic.ClosedAt = DateTime.UtcNow;
             diagnostic.UpdatedAt = DateTime.UtcNow;
 
@@ -198,6 +198,11 @@ namespace Fota.BusinessLayer.Repositories
                 .Where(d => d.CreatedAt >= startDate && d.CreatedAt <= endDate)
                 .OrderByDescending(d => d.CreatedAt)
                 .ToListAsync();
+        }
+
+        public async Task<int> GetTotalDiagnosticsCountAsync()
+        {
+            return await _dbSet.CountAsync();
         }
     }
 }

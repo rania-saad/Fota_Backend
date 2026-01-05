@@ -49,8 +49,7 @@ namespace Fota.BusinessLayer.Services
             {
                 UserName = model.UserName,
                 Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
+               
                 PhoneNumber=model.PhoneNumber,
             };
 
@@ -75,7 +74,7 @@ namespace Fota.BusinessLayer.Services
                 return new AuthModel { Message = errors, IsAuthenticated = false };
             }
 
-            await _userManager.AddToRoleAsync(user, "Admin");
+            await _userManager.AddToRoleAsync(user, "ADMIN");
 
             var token = await GenerateJwtToken(user); // now returns string ✅
 

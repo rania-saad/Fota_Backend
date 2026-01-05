@@ -75,5 +75,10 @@ namespace Fota.BusinessLayer.Repositories
                 .Where(s => s.MessageDeliveries.Any())
                 .ToListAsync();
         }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            return await _dbSet.CountAsync();
+        }
     }
 }

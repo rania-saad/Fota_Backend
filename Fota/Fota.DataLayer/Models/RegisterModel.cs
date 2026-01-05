@@ -13,13 +13,13 @@ namespace Fota.DataLayer.Models
         // Full name of the user
         public string UserName { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(100)]
-        public string FirstName { get; set; }
+        //[Required]
+        //[MaxLength(100)]
+        //public string FirstName { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        public string LastName { get; set; }
+        //[Required]
+        //[MaxLength(100)]
+        //public string LastName { get; set; }
 
         [Required, StringLength(150)]
 
@@ -39,7 +39,7 @@ namespace Fota.DataLayer.Models
         // Optional phone number
         public string? PhoneNumber { get; set; }
 
-        // Optional address
-        public string? Address { get; set; }
+        //// Optional address
+        //public string? Address { get; set; }
     }
 }
