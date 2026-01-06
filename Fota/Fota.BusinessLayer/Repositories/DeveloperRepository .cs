@@ -81,6 +81,18 @@ using Microsoft.EntityFrameworkCore;
                 .Where(t => t.IsActive)
                 .ToListAsync();
         }
+
+        public async Task<int?> GetDeveloperIdByIdentityUserIdAsync(string identityUserId)
+        {
+            if (string.IsNullOrWhiteSpace(identityUserId))
+                return null;
+
+            return await _dbSet
+                .Where(d => d.IdentityUserId == identityUserId)
+                .Select(d => (int?)d.Id)
+                .FirstOrDefaultAsync();
+        }
+
     }
 }
 

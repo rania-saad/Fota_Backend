@@ -11,6 +11,8 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Fota.BusinessLayer.Services;
+using Microsoft.AspNetCore.Http;
+
 namespace Fota.Controllers
 {
     [Route("api/[controller]")]
@@ -18,10 +20,13 @@ namespace Fota.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService)
+
+        public AuthController(IAuthService authService , ILogger<AuthController> logger)
         {
             _authService = authService;
+            _logger = logger;
         }
 
         [HttpPost("Register")]
@@ -74,5 +79,10 @@ namespace Fota.Controllers
             return Ok(model);
 
         }
+
+
+
+
+
     }
 }

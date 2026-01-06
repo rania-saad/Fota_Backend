@@ -24,7 +24,7 @@ namespace Fota.BusinessLayer.Services
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
-            IOptions<JwtSettings> jwtOptions , RoleManager<IdentityRole> roleManager, IDeveloperRepository developerRepository, FOTADbContext context)
+            IOptions<JwtSettings> jwtOptions, RoleManager<IdentityRole> roleManager, IDeveloperRepository developerRepository, FOTADbContext context)
         {
             _userManager = userManager;
             _jwtSettings = jwtOptions.Value;
@@ -49,8 +49,8 @@ namespace Fota.BusinessLayer.Services
             {
                 UserName = model.UserName,
                 Email = model.Email,
-               
-                PhoneNumber=model.PhoneNumber,
+
+                PhoneNumber = model.PhoneNumber,
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -62,7 +62,7 @@ namespace Fota.BusinessLayer.Services
                 IdentityUserId = user.Id
             };
 
-          
+
 
             await _context.Developers.AddAsync(developer);
             await _context.SaveChangesAsync();
@@ -74,7 +74,7 @@ namespace Fota.BusinessLayer.Services
                 return new AuthModel { Message = errors, IsAuthenticated = false };
             }
 
-            await _userManager.AddToRoleAsync(user, "ADMIN");
+            await _userManager.AddToRoleAsync(user, "DEVELOPER");
 
             var token = await GenerateJwtToken(user); // now returns string ✅
 
@@ -92,26 +92,32 @@ namespace Fota.BusinessLayer.Services
             };
         }
 
-        //    public async Task<AuthModel> LoginAsync(string email, string password)
-        //    {
-        //        var user = await _userManager.FindByEmailAsync(email);
-        //        if (user == null || !await _userManager.CheckPasswordAsync(user, password))
-        //            return new AuthModel { Message = "Invalid email or password", IsAuthenticated = false };
+        public async Task<AuthModel> LoginAsync(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, password))
+                return new AuthModel
+                {
+                    Message = "Invalid email or password",
+                    IsAuthenticated = false
+                };
 
-        //        var token = GenerateJwtTokenString(user);
+            var token = await GenerateJwtToken(user);
+            var roles = await _userManager.GetRolesAsync(user);
 
-        //        return new AuthModel
-        //        {
-        //            IsAuthenticated = true,
-        //            Email = user.Email,
-        //            UserName = user.UserName,
-        //            Roles = await _userManager.GetRolesAsync(user),
-        //            Token = token,
-        //            Expiration = DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes)
-        //        };
-        //    }
+            return new AuthModel
+            {
+                Message = "Login successful",
+                IsAuthenticated = true,
+                Email = user.Email,
+                UserName = user.UserName,
+                Roles = roles.ToList(),
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expiration = DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes)
+            };
+        }
 
-        //    // 🔐 Token generator returning string ✔
+        // 🔐 Token generator returning string ✔
         private async Task<JwtSecurityToken> GenerateJwtToken(ApplicationUser user)
         {
             var roles = await _userManager.GetRolesAsync(user);
@@ -144,7 +150,7 @@ namespace Fota.BusinessLayer.Services
                 claims: claims,
                 signingCredentials: signingCredentials
                 );
-           
+
 
             return jwtSecuritytoken;
             //return token ;
@@ -152,8 +158,8 @@ namespace Fota.BusinessLayer.Services
 
 
         public async Task<AuthModel> GetTokenAsync(TokenRequestModel Model)
-        { 
-            var AuthModel =new AuthModel();
+        {
+            var AuthModel = new AuthModel();
             var user = await _userManager.FindByEmailAsync(Model.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, Model.Password))
             {
@@ -179,24 +185,7 @@ namespace Fota.BusinessLayer.Services
         }
 
 
-        //        public async Task<string> AddRoleAsync(AddRole Model)
-        //        {
-        //            var user = await _userManager.FindByIdAsync(Model.UserId);
-        //            if (user==null || !await _roleManager.RoleExistsAsync(Model.RoleName)
-        //)
-        //            {
-        //                return ("Invalid UserId or role");
-        //            }
-
-        //            if (await _userManager.IsInRoleAsync(user, Model.RoleName))
-        //            {
-        //                return ("user already in this role");
-        //            }
-        //            var result = await _userManager.AddToRoleAsync(user, Model.RoleName);
-
-        //            return result.Succeeded ? string.Empty : "Some thing went wrong";
-        //
-        //        
+         
         public async Task<string> AddRoleAsync(AddRole model)
         {
             // ❗هنا بدل ما ناخد UserId من TokenRequest، بناخد DeveloperId
@@ -214,6 +203,8 @@ namespace Fota.BusinessLayer.Services
             var result = await _userManager.AddToRoleAsync(user, model.RoleName);
             return result.Succeeded ? string.Empty : "Something went wrong";
         }
+
+    
 
 
     }

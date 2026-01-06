@@ -13,5 +13,6 @@ namespace Fota.BusinessLayer.Interfaces
         Task<IEnumerable<Developer>> GetActiveDevelopersAsync();
         Task<IEnumerable<Developer>> GetByTeamAsync(int teamId);
         Task<IEnumerable<Team>> GetTeamsByDeveloperIdAsync(int developerId);
+        Task<int?> GetDeveloperIdByIdentityUserIdAsync(string identityUserId);
     }
 }

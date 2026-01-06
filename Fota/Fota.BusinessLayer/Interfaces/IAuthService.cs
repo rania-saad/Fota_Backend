@@ -10,10 +10,12 @@ namespace Fota.BusinessLayer.Interfaces
 {
     public interface IAuthService
     {
-       // Task<string> LoginAsync(string email, string password);
+        Task<AuthModel> LoginAsync(string email, string password);
         Task<AuthModel> RegisterAsync(RegisterModel Model);
-        // Task<JwtSecurityToken> GenerateJwtToken(ApplicationUser user);
+         //Task<JwtSecurityToken> GenerateJwtToken(ApplicationUser user);
         Task<AuthModel> GetTokenAsync(TokenRequestModel Model);
         Task<string> AddRoleAsync(AddRole Model);
+
+
     }
 }

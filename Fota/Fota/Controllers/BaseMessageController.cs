@@ -5,8 +5,11 @@ using Fota.BusinessLayer.Interfaces;
 using Fota.BusinessLayer.Repositories;
 using Fota.DataLayer.Enum;
 using Fota.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SharedProjectDTOs.BaseMessages;
+using System.Security.Claims;
 
 namespace StaffAffairs.AWebAPI.Controllers
 {
@@ -15,6 +18,7 @@ namespace StaffAffairs.AWebAPI.Controllers
     public class BaseMessagesController : ControllerBase
     {
         private readonly IBaseMessageRepository _baseMessageRepository;
+        private readonly IDeveloperRepository _developerRepository;
         private readonly IMapper _mapper;
         // ✅ استخدام Logger خاص بالـ Controller
         private readonly ILogger<BaseMessagesController> _logger;
@@ -22,14 +26,39 @@ namespace StaffAffairs.AWebAPI.Controllers
         public BaseMessagesController(
             IBaseMessageRepository baseMessageRepository,
             IMapper mapper,
-            ILogger<BaseMessagesController> logger)
+            IDeveloperRepository developerRepository,
+        ILogger<BaseMessagesController> logger)
         {
             _baseMessageRepository = baseMessageRepository;
             _mapper = mapper;
             _logger = logger;
+            _developerRepository=developerRepository;
         }
 
-        // GET: api/BaseMessages
+        private async Task<int> GetCurrentDeveloperIdAsync()
+        {
+            var identityUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(identityUserId))
+                throw new UnauthorizedAccessException("User is not authenticated");
+
+            var developerId = await _developerRepository
+                .GetDeveloperIdByIdentityUserIdAsync(identityUserId);
+
+            if (!developerId.HasValue)
+                throw new UnauthorizedAccessException("Developer not found for this user");
+
+            return developerId.Value;
+        }
+
+
+
+
+
+
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetAllBaseMessages()
         {
@@ -55,7 +84,9 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // GET: api/BaseMessages/5
+
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
         [HttpGet("{id}")]
         public async Task<ActionResult<BaseMessageGetDto>> GetBaseMessageById(int id)
         {
@@ -81,7 +112,8 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // GET: api/BaseMessages/5/file
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
         [HttpGet("{id}/file")]
         public async Task<ActionResult<BaseMessageWithFileDto>> GetBaseMessageWithFile(int id)
         {
@@ -107,7 +139,9 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // GET: api/BaseMessages/search?name=firmware
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
+
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> SearchBaseMessages([FromQuery] string name)
         {
@@ -133,7 +167,8 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // GET: api/BaseMessages/status/Published
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
         [HttpGet("status/{status}")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetBaseMessagesByStatus(BaseMessageStatus status)
         {
@@ -156,7 +191,9 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // GET: api/BaseMessages/type/Diagnostic
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
+
         [HttpGet("type/{messageType}")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetBaseMessagesByType(BaseMessageType messageType)
         {
@@ -178,8 +215,7 @@ namespace StaffAffairs.AWebAPI.Controllers
                     });
             }
         }
-
-        // GET: api/BaseMessages/uploader/5
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("uploader/{uploaderId}")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetBaseMessagesByUploader(int uploaderId)
         {
@@ -202,7 +238,9 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // GET: api/BaseMessages/topic/5
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
+
         [HttpGet("topic/{topicId}")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetBaseMessagesByTopic(int topicId)
         {
@@ -225,7 +263,9 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // GET: api/BaseMessages/published
+
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
         [HttpGet("published")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetPublishedMessages()
         {
@@ -248,7 +288,8 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // GET: api/BaseMessages/pending-approval
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
         [HttpGet("pending-approval")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetPendingApprovalMessages()
         {
@@ -271,7 +312,9 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // POST: api/BaseMessages
+
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
         [HttpPost("create")]
         public async Task<ActionResult<BaseMessageGetDto>> CreateBaseMessage([FromBody] BaseMessageCreateDto dto)
         {
@@ -307,7 +350,9 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // PUT: api/BaseMessages/5
+
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
         [HttpPut("{id}")]
         public async Task<ActionResult<BaseMessageGetDto>> UpdateBaseMessage(int id, [FromBody] BaseMessageUpdateDto dto)
         {
@@ -352,7 +397,9 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // POST: api/BaseMessages/5/approve
+
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
         [HttpPost("{id}/approve")]
         public async Task<ActionResult<BaseMessageGetDto>> ApproveMessage(int id, [FromBody] BaseMessageApproveDto dto)
         {
@@ -378,7 +425,7 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // POST: api/BaseMessages/5/reject
+        [Authorize(Roles = "ADMIN")]
         [HttpPost("{id}/reject")]
         public async Task<ActionResult<BaseMessageGetDto>> RejectMessage(int id, [FromBody] BaseMessageRejectDto dto)
         {
@@ -405,6 +452,7 @@ namespace StaffAffairs.AWebAPI.Controllers
         }
 
         // ✅ POST: api/BaseMessages/5/publish - With MQTT Integration
+        [Authorize(Roles = "ADMIN")]
         [HttpPost("{id}/publish")]
         public async Task<ActionResult<BaseMessageGetDto>> PublishMessage([FromBody] BaseMessagePublishDto dto, int id)
         {
@@ -461,6 +509,8 @@ namespace StaffAffairs.AWebAPI.Controllers
         }
 
         // DELETE: api/BaseMessages/5
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBaseMessage(int id)
         {
@@ -486,6 +536,8 @@ namespace StaffAffairs.AWebAPI.Controllers
         }
 
         [HttpGet("TotalMessages")]
+        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "DEVELOPER")]
         public async Task<IActionResult> GetTotalMessages()
         {
             var totalMessages = await _baseMessageRepository.GetTotalMessagesCountAsync();
