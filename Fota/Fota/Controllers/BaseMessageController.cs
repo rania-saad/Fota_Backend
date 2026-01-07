@@ -563,7 +563,8 @@ namespace StaffAffairs.AWebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // ✅ Global authorization - كل الـ endpoints تحتاج authentication
+    //[Authorize(Roles = "ADMIN,DEVELOPER")]
+
     public class BaseMessagesController : ControllerBase
     {
         private readonly IBaseMessageRepository _baseMessageRepository;
@@ -655,7 +656,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// GET: api/BaseMessages
         /// </summary>
         [HttpGet]
-        [Authorize(Roles = "ADMIN,DEVELOPER")] // ✅ OR logic - أي واحد منهم
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetAllBaseMessages()
         {
             try
@@ -694,7 +694,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// GET: api/BaseMessages/5
         /// </summary>
         [HttpGet("{id}")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<BaseMessageGetDto>> GetBaseMessageById(int id)
         {
             try
@@ -729,7 +728,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// GET: api/BaseMessages/5/file
         /// </summary>
         [HttpGet("{id}/file")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<BaseMessageWithFileDto>> GetBaseMessageWithFile(int id)
         {
             try
@@ -761,7 +759,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// GET: api/BaseMessages/search?name=test
         /// </summary>
         [HttpGet("search")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> SearchBaseMessages([FromQuery] string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -793,7 +790,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// GET: api/BaseMessages/status/Draft
         /// </summary>
         [HttpGet("status/{status}")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetBaseMessagesByStatus(BaseMessageStatus status)
         {
             try
@@ -822,7 +818,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// GET: api/BaseMessages/type/Update
         /// </summary>
         [HttpGet("type/{messageType}")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetBaseMessagesByType(BaseMessageType messageType)
         {
             try
@@ -850,18 +845,29 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// <summary>
         /// GET: api/BaseMessages/uploader/5
         /// </summary>
-        [HttpGet("uploader/{uploaderId}")]
-        [Authorize(Roles = "ADMIN")]
-        public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetBaseMessagesByUploader(int uploaderId)
+        /// <summary>
+        /// GET: api/BaseMessages/my
+        /// ✅ يرجّع الرسائل اللي أنا رافعهـا (UploaderId من الـ Token)
+        /// </summary>
+        [HttpGet("my")]
+        //[Authorize(Roles = "ADMIN,DEVELOPER")]
+        public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetMyBaseMessages()
         {
             try
             {
-                var userId = GetCurrentUserIdentityId();
-                _logger.LogInformation("👤 Admin {UserId} requesting messages by uploader: {UploaderId}",
-                    userId, uploaderId);
+                // ✅ DeveloperId من الـ Claims
+                var developerId = await GetCurrentDeveloperIdAsync();
 
-                var messages = await _baseMessageRepository.GetByUploaderAsync(uploaderId);
-                var messageDtos = _mapper.Map<List<BaseMessageListDto>>(messages);
+                _logger.LogInformation(
+                    "👤 Developer {DeveloperId} requesting his uploaded messages",
+                    developerId
+                );
+
+                var messages =
+                    await _baseMessageRepository.GetByUploaderAsync(developerId);
+
+                var messageDtos =
+                    _mapper.Map<List<BaseMessageListDto>>(messages);
 
                 return Ok(messageDtos);
             }
@@ -871,9 +877,11 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Error getting messages by uploader {UploaderId}", uploaderId);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { message = "An unexpected error occurred" });
+                _logger.LogError(ex, "❌ Error getting base messages for current uploader");
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new { message = "An unexpected error occurred" }
+                );
             }
         }
 
@@ -881,7 +889,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// GET: api/BaseMessages/topic/5
         /// </summary>
         [HttpGet("topic/{topicId}")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetBaseMessagesByTopic(int topicId)
         {
             try
@@ -911,7 +918,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// GET: api/BaseMessages/published
         /// </summary>
         [HttpGet("published")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetPublishedMessages()
         {
             try
@@ -940,7 +946,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// GET: api/BaseMessages/pending-approval
         /// </summary>
         [HttpGet("pending-approval")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<IEnumerable<BaseMessageListDto>>> GetPendingApprovalMessages()
         {
             try
@@ -969,7 +974,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// GET: api/BaseMessages/TotalMessages
         /// </summary>
         [HttpGet("TotalMessages")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<IActionResult> GetTotalMessages()
         {
             try
@@ -1007,7 +1011,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// ✅ يأخذ UploaderId من الـ Claims تلقائياً
         /// </summary>
         [HttpPost("create")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<BaseMessageGetDto>> CreateBaseMessage([FromBody] BaseMessageCreateDto dto)
         {
             try
@@ -1059,7 +1062,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// PUT: api/BaseMessages/5
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<BaseMessageGetDto>> UpdateBaseMessage(int id, [FromBody] BaseMessageUpdateDto dto)
         {
             try
@@ -1130,7 +1132,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// ✅ يأخذ ApprovedById من الـ Claims
         /// </summary>
         [HttpPost("{id}/approve")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult<BaseMessageGetDto>> ApproveMessage(int id)
         {
             try
@@ -1182,7 +1183,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// ✅ ADMIN only
         /// </summary>
         [HttpPost("{id}/reject")]
-        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<BaseMessageGetDto>> RejectMessage(int id, [FromBody] BaseMessageRejectDto dto)
         {
             try
@@ -1230,7 +1230,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// ✅ يأخذ PublisherId من الـ Claims
         /// </summary>
         [HttpPost("{id}/publish")]
-        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<BaseMessageGetDto>> PublishMessage(int id)
         {
             try
@@ -1302,7 +1301,6 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// DELETE: api/BaseMessages/5
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
         public async Task<ActionResult> DeleteBaseMessage(int id)
         {
             try

@@ -1,14 +1,17 @@
-﻿using Fota.Models;
+﻿using AutoMapper;
+using Fota.BusinessLayer.Interfaces;
+using Fota.BusinessLayer.Repositories;
+using Fota.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Fota.BusinessLayer.Interfaces;
-using SharedProjectDTOs.Topics;
-using AutoMapper;
-using Fota.BusinessLayer.Repositories;
 using SharedProjectDTOs.Admin;
+using SharedProjectDTOs.Topics;
 
 namespace Fota.Controllers
 {
+    //[Authorize(Roles = "ADMIN,DEVELOPER")]
+
     [ApiController]
     [Route("api/[controller]")]
     public class TopicsController : ControllerBase

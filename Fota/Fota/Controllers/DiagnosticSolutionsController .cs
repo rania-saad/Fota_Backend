@@ -2,6 +2,7 @@
 using Fota.BusinessLayer.Interfaces;
 using Fota.BusinessLayer.Repositories;
 using Fota.DataLayer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SharedProjectDTOs.BaseMessages;
@@ -9,6 +10,8 @@ using SharedProjectDTOs.DiagnosticSolutionDTOs;
 
 namespace StaffAffairs.AWebAPI.Controllers
 {
+    //[Authorize(Roles = "ADMIN,DEVELOPER")]
+
     [ApiController]
     [Route("api/[controller]")]
     public class DiagnosticSolutionsController : ControllerBase

@@ -62,7 +62,7 @@ namespace SharedProjectDTOs.BaseMessages
         public BaseMessageStatus Status { get; set; } 
 
         public int TopicId { get; set; }
-        public int UploaderId { get; set; }
+        //public int UploaderId { get; set; }
     }
     public class BaseMessageUpdateDto
     {

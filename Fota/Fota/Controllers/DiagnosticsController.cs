@@ -1,24 +1,100 @@
-﻿using Fota.BusinessLayer.Interfaces;
+﻿using AutoMapper;
+using Fota.BusinessLayer.Interfaces;
+using Fota.BusinessLayer.Repositories;
+using Fota.DataLayer.Enum;
 using Fota.DataLayer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using SharedProjectDTOs.DiagnosticDTOs;
 using SharedProjectDTOs.DiagnosticDTOs.SharedProjectDTOs.Diagnostics;
-using Fota.DataLayer.Enum;
+using System.Security.Claims;
 namespace StaffAffairs.AWebAPI.Controllers
 {
+    //[Authorize(Roles = "ADMIN,DEVELOPER")]
+
     [ApiController]
     [Route("api/[controller]")]
     public class DiagnosticsController : ControllerBase
     {
         private readonly IDiagnosticRepository _diagnosticRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<BaseMessagesController> _logger;
+        private readonly IDeveloperRepository _developerRepository;
 
-        public DiagnosticsController(IDiagnosticRepository diagnosticRepository, IMapper mapper)
+
+        public DiagnosticsController(IDiagnosticRepository diagnosticRepository, IMapper mapper, ILogger<BaseMessagesController> logger, IDeveloperRepository developerRepository)
         {
             _diagnosticRepository = diagnosticRepository;
             _mapper = mapper;
+            _logger = logger;
+            _developerRepository = developerRepository;
         }
+
+
+        private async Task<int> GetCurrentDeveloperIdAsync()
+        {
+            // ✅ جرب أكثر من Claim Type
+            var identityUserId = User.FindFirst("uid")?.Value
+                              ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(identityUserId))
+            {
+                _logger.LogWarning("⚠️ User is not authenticated - no uid or NameIdentifier claim found");
+                throw new UnauthorizedAccessException("User is not authenticated");
+            }
+
+            _logger.LogInformation("🔍 Looking for developer with IdentityUserId: {UserId}", identityUserId);
+
+            var developerId = await _developerRepository
+                .GetDeveloperIdByIdentityUserIdAsync(identityUserId);
+
+            if (!developerId.HasValue)
+            {
+                _logger.LogWarning("⚠️ Developer not found for IdentityUserId: {UserId}", identityUserId);
+                throw new UnauthorizedAccessException("Developer not found for this user");
+            }
+
+            _logger.LogInformation("✅ Found DeveloperId: {DeveloperId}", developerId.Value);
+            return developerId.Value;
+        }
+
+        /// <summary>
+        /// ✅ Helper: استخراج User Identity ID فقط
+        /// </summary>
+        private string GetCurrentUserIdentityId()
+        {
+            var identityUserId = User.FindFirst("uid")?.Value
+                              ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(identityUserId))
+            {
+                _logger.LogWarning("⚠️ User Identity ID not found in claims");
+                throw new UnauthorizedAccessException("User is not authenticated");
+            }
+
+            return identityUserId;
+        }
+
+        /// <summary>
+        /// ✅ Helper: التحقق من الـ Roles
+        /// </summary>
+        private bool IsAdmin()
+        {
+            var isAdmin = User.IsInRole("ADMIN");
+            _logger.LogInformation("👤 User is admin: {IsAdmin}", isAdmin);
+            return isAdmin;
+        }
+
+        private bool IsDeveloper()
+        {
+            var isDeveloper = User.IsInRole("DEVELOPER");
+            _logger.LogInformation("👤 User is developer: {IsDeveloper}", isDeveloper);
+            return isDeveloper;
+        }
+
+
+
+
 
         // GET: api/Diagnostics
         [HttpGet]
@@ -203,29 +279,41 @@ namespace StaffAffairs.AWebAPI.Controllers
             }
         }
 
-        // GET: api/Diagnostics/developer/5
-        [HttpGet("developer/{developerId}")]
-        public async Task<ActionResult<IEnumerable<DiagnosticListDto>>> GetDiagnosticsByDeveloper(int developerId)
+        // GET: api/Diagnostics/my
+        [HttpGet("my")]
+        [Authorize(Roles = "ADMIN,DEVELOPER")]
+        public async Task<ActionResult<IEnumerable<DiagnosticListDto>>> GetMyDiagnostics()
         {
             try
             {
-                var diagnostics = await _diagnosticRepository.GetByAssignedDeveloperAsync(developerId);
+                // ✅ DeveloperId جاي من الـ Token
+                var developerId = await GetCurrentDeveloperIdAsync();
+
+                _logger.LogInformation("👤 Developer {DeveloperId} requesting assigned diagnostics", developerId);
+
+                var diagnostics =
+                    await _diagnosticRepository.GetByAssignedDeveloperAsync(developerId);
+
                 var diagnosticDtos = _mapper.Map<List<DiagnosticListDto>>(diagnostics);
+
                 return Ok(diagnosticDtos);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "🔒 Unauthorized access to developer diagnostics");
+                return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "❌ Error getting diagnostics for current developer");
                 return StatusCode(
                     StatusCodes.Status500InternalServerError,
-                    new ProblemDetails
-                    {
-                        Title = "Internal Server Error",
-                        Status = StatusCodes.Status500InternalServerError,
-                        Detail = "An unexpected error occurred while processing your request"
-                    }
+                    new { message = "An unexpected error occurred" }
                 );
             }
         }
+
+        
 
         // GET: api/Diagnostics/open
         [HttpGet("open")]

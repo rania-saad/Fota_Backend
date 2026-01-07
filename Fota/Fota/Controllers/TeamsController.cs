@@ -111,15 +111,18 @@
 //        }
 //    }
 //}
-using Microsoft.AspNetCore.Mvc;
-using Fota.BusinessLayer.Interfaces;
-using SharedProjectDTOs.Teams;
 using AutoMapper;
-using Fota.DataLayer.Models;
+using Fota.BusinessLayer.Interfaces;
 using Fota.BusinessLayer.Repositories;
+using Fota.DataLayer.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SharedProjectDTOs.Teams;
 
 namespace Fota.Controllers
 {
+    //[Authorize(Roles = "ADMIN,DEVELOPER")]
+
     [ApiController]
     [Route("api/[controller]")]
     public class TeamsController : ControllerBase

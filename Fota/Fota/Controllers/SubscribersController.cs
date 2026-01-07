@@ -3,11 +3,14 @@ using AutoMapper;
 using Fota.BusinessLayer.Interfaces;
 using Fota.BusinessLayer.Repositories;
 using Fota.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedProjectDTOs.Subscribers;
 
 namespace Fota.AWebAPI.Controllers
 {
+    [Authorize(Roles = "ADMIN,DEVELOPER")]
+
     [ApiController]
     [Route("api/[controller]")]
     public class SubscribersController : ControllerBase
