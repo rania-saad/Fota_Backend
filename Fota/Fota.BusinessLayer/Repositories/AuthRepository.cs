@@ -118,42 +118,85 @@ namespace Fota.BusinessLayer.Services
         }
 
         // 🔐 Token generator returning string ✔
+        //private async Task<JwtSecurityToken> GenerateJwtToken(ApplicationUser user)
+        //{
+        //    var roles = await _userManager.GetRolesAsync(user);
+        //    var userClaims = await _userManager.GetClaimsAsync(user);
+        //    var roleClaims = new List<Claim>();
+
+
+        //    foreach (var role in roles)
+        //    {
+        //        roleClaims.Add(new Claim("roles", role));
+        //    }
+        //    var claims = new[]
+        //    {
+        //        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+        //        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        //        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        //        new Claim("uid", user.Id)
+        //    }
+        //    .Union(userClaims)
+        //    .Union(roleClaims)
+        //    ;
+
+
+        //    var SymmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+        //    var signingCredentials = new SigningCredentials(SymmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+        //    var jwtSecuritytoken = new JwtSecurityToken(
+        //        issuer: _jwtSettings.Issuer,
+        //        audience: _jwtSettings.Audience,
+        //        expires: DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
+        //        claims: claims,
+        //        signingCredentials: signingCredentials
+        //        );
+
+
+        //    return jwtSecuritytoken;
+        //    //return token ;
+        //}
+
         private async Task<JwtSecurityToken> GenerateJwtToken(ApplicationUser user)
         {
             var roles = await _userManager.GetRolesAsync(user);
             var userClaims = await _userManager.GetClaimsAsync(user);
             var roleClaims = new List<Claim>();
 
-
+            // ✅ استخدم ClaimTypes.Role بدلاً من "roles"
             foreach (var role in roles)
             {
-                roleClaims.Add(new Claim("roles", role));
+                roleClaims.Add(new Claim(ClaimTypes.Role, role));
             }
+
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("uid", user.Id)
-            }
+        new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim("uid", user.Id),
+        new Claim(ClaimTypes.NameIdentifier, user.Id),  // ✅ إضافة NameIdentifier
+        new Claim(ClaimTypes.Name, user.UserName)       // ✅ إضافة Name
+    }
             .Union(userClaims)
-            .Union(roleClaims)
-            ;
+            .Union(roleClaims);
 
+            var symmetricSecurityKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_jwtSettings.Key)
+            );
+            var signingCredentials = new SigningCredentials(
+                symmetricSecurityKey,
+                SecurityAlgorithms.HmacSha256
+            );
 
-            var SymmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-            var signingCredentials = new SigningCredentials(SymmetricSecurityKey, SecurityAlgorithms.HmacSha256);
-            var jwtSecuritytoken = new JwtSecurityToken(
+            var jwtSecurityToken = new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 expires: DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
                 claims: claims,
                 signingCredentials: signingCredentials
-                );
+            );
 
-
-            return jwtSecuritytoken;
-            //return token ;
+            return jwtSecurityToken;
         }
 
 

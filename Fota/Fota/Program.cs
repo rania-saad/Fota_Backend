@@ -2,22 +2,23 @@
 
 
 //using Fota.Data;
+using Fota.BusinessLayer.Interfaces;
 using Fota.BusinessLayer.Repositories;
-using Fota.DataLayer.DBContext;
 using Fota.BusinessLayer.Services;
+using Fota.BusinessLayer.Services;
+using Fota.DataLayer.DBContext;
+using Fota.DataLayer.DBContext;
+using Fota.DataLayer.Models;
+using Fota.DataLayer.Repositories.Implementation;
+using Fota.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 //using Fota.Services;
 using Microsoft.EntityFrameworkCore;
-using Fota.BusinessLayer.Interfaces;
-using Fota.DataLayer.Repositories.Implementation;
-using Fota.DataLayer.Models;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
-using Fota.BusinessLayer.Services;
-using Fota.Services;
-using Fota.DataLayer.DBContext;
 
 namespace Fota
 {
@@ -68,53 +69,106 @@ namespace Fota
                       .AddEntityFrameworkStores<FOTADbContext>();
 
 
+            //            builder.Services.AddAuthentication(options =>
+            //            {
+            //                // Read JWT token from request header and authenticate using Bearer scheme
+            //                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            //                // When [Authorize] fails, return 401 Unauthorized (instead of redirecting or sending 404)
+            //                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            //                // Set default scheme for the app
+            //            })
+            //.AddJwtBearer(options =>
+            //{
+            //    // Save token after successful login (useful if you need it later)
+            //    options.SaveToken = true;
+
+            //    // Allow HTTP for local development; set to true only when using HTTPS
+            //    options.RequireHttpsMetadata = false;
+
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        // Ensure the token issuer matches the configured issuer
+            //        ValidateIssuer = true,
+
+            //        // Ensure the token audience matches the configured audience
+            //        ValidateAudience = true,
+
+            //        // Ensure the token is not expired
+            //        ValidateLifetime = true,
+
+            //        // Ensure the signing key is valid
+            //        ValidateIssuerSigningKey = true,
+
+            //        // Read issuer and audience from configuration (appsettings.json)
+            //        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            //        ValidAudience = builder.Configuration["JwtSettings:Audience"],
+
+            //        // Validate token signature using the secret key
+            //        IssuerSigningKey = new SymmetricSecurityKey(
+            //            Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]!)
+            //        )
+            //    };
+
+            //    // Optional: Allow small clock difference when validating expiration time
+            //    // options.TokenValidationParameters.ClockSkew = TimeSpan.FromMinutes(2);
+            //});
+
             builder.Services.AddAuthentication(options =>
             {
-                // Read JWT token from request header and authenticate using Bearer scheme
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-
-                // When [Authorize] fails, return 401 Unauthorized (instead of redirecting or sending 404)
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
-                // Set default scheme for the app
             })
 .AddJwtBearer(options =>
 {
-    // Save token after successful login (useful if you need it later)
     options.SaveToken = true;
-
-    // Allow HTTP for local development; set to true only when using HTTPS
     options.RequireHttpsMetadata = false;
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        // Ensure the token issuer matches the configured issuer
         ValidateIssuer = true,
-
-        // Ensure the token audience matches the configured audience
         ValidateAudience = true,
-
-        // Ensure the token is not expired
         ValidateLifetime = true,
-
-        // Ensure the signing key is valid
         ValidateIssuerSigningKey = true,
 
-        // Read issuer and audience from configuration (appsettings.json)
         ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
         ValidAudience = builder.Configuration["JwtSettings:Audience"],
 
-        // Validate token signature using the secret key
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]!)
-        )
+        ),
+
+        // ✅ هذا مهم جداً - يسمح بفرق 5 دقائق في التوقيت
+        ClockSkew = TimeSpan.Zero,
+
+        // ✅ Map الـ claims بشكل صحيح
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.Name
     };
 
-    // Optional: Allow small clock difference when validating expiration time
-    // options.TokenValidationParameters.ClockSkew = TimeSpan.FromMinutes(2);
+    // ✅ إضافة Events للـ Debugging
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("Token validated successfully");
+            var claims = context.Principal?.Claims.Select(c => $"{c.Type}: {c.Value}");
+            Console.WriteLine($"Claims: {string.Join(", ", claims ?? Array.Empty<string>())}");
+            return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            Console.WriteLine($"OnChallenge: {context.Error}, {context.ErrorDescription}");
+            return Task.CompletedTask;
+        }
+    };
 });
-
-
             // 4. MQTT Services
             builder.Services.AddSingleton<MqttService>();
             builder.Services.AddHostedService<MqttBackgroundService>();
