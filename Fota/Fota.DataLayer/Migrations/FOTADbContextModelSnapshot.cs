@@ -107,16 +107,6 @@ namespace Fota.DataLayer.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -177,6 +167,14 @@ namespace Fota.DataLayer.Migrations
                     b.Property<int?>("AssignedToDeveloperId")
                         .HasColumnType("int");
 
+                    b.Property<string>("CarBrand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CarModel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("ClosedAt")
                         .HasColumnType("datetime2");
 
@@ -236,6 +234,8 @@ namespace Fota.DataLayer.Migrations
                             Id = 1,
                             AssignedByAdminId = 1,
                             AssignedToDeveloperId = 2,
+                            CarBrand = "Kia",
+                            CarModel = "Sportage",
                             CreatedAt = new DateTime(2024, 5, 20, 8, 30, 0, 0, DateTimeKind.Unspecified),
                             Description = "Battery pack temperature exceeding normal range in test vehicle VIN:ABC123",
                             Priority = 0,
@@ -877,6 +877,10 @@ namespace Fota.DataLayer.Migrations
                     b.Property<int?>("UpdatedById")
                         .HasColumnType("int");
 
+                    b.Property<string>("location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
@@ -893,7 +897,8 @@ namespace Fota.DataLayer.Migrations
                             Email = "fleet.cairo@toyota-eg.com",
                             IsActive = true,
                             Name = "Toyota Fleet - Cairo",
-                            PhoneNumber = "+201234567895"
+                            PhoneNumber = "+201234567895",
+                            location = " Egypt , Menoufya"
                         },
                         new
                         {
@@ -902,7 +907,8 @@ namespace Fota.DataLayer.Migrations
                             Email = "test.center@bmw-eg.com",
                             IsActive = true,
                             Name = "BMW Test Center",
-                            PhoneNumber = "+201234567896"
+                            PhoneNumber = "+201234567896",
+                            location = " Egypt , Menoufya"
                         });
                 });
 
@@ -1003,6 +1009,20 @@ namespace Fota.DataLayer.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "role-admin",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "role-developer",
+                            Name = "Developer",
+                            NormalizedName = "DEVELOPER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -19,6 +19,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Fota
 {
@@ -206,6 +207,15 @@ namespace Fota
         }
     });
             });
+
+            builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter()
+        );
+    });
+
 
 
             var app = builder.Build();

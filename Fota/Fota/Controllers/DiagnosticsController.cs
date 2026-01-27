@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Fota.BusinessLayer.Interfaces;
 using Fota.BusinessLayer.Repositories;
+using System.Text.Json.Serialization;
+
 using Fota.DataLayer.Enum;
 using Fota.DataLayer.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -20,14 +22,16 @@ namespace StaffAffairs.AWebAPI.Controllers
         private readonly IMapper _mapper;
         private readonly ILogger<BaseMessagesController> _logger;
         private readonly IDeveloperRepository _developerRepository;
+        public readonly ITopicRepository _topicRepository;
 
 
-        public DiagnosticsController(IDiagnosticRepository diagnosticRepository, IMapper mapper, ILogger<BaseMessagesController> logger, IDeveloperRepository developerRepository)
+        public DiagnosticsController(IDiagnosticRepository diagnosticRepository, IMapper mapper, ILogger<BaseMessagesController> logger, IDeveloperRepository developerRepository, ITopicRepository topicRepository)
         {
             _diagnosticRepository = diagnosticRepository;
             _mapper = mapper;
             _logger = logger;
             _developerRepository = developerRepository;
+            _topicRepository = topicRepository;
         }
 
 
@@ -395,15 +399,29 @@ namespace StaffAffairs.AWebAPI.Controllers
         {
             try
             {
+
+                var topic = await _topicRepository
+                     .GetByNameAsync(dto.TopicName);
+
+                if (topic == null)
+                {
+                    return BadRequest(new ProblemDetails
+                    {
+                        Title = "Invalid Topic",
+                        Detail = $"Topic '{dto.TopicName}' does not exist"
+                    });
+                }
                 var diagnostic = new Diagnostic
                 {
                     Title = dto.Title,
                     Description = dto.Description,
                     Priority = dto.Priority,
                     SubscriberId = dto.SubscriberId,
-                    TopicId = dto.TopicId,
+                    TopicId = topic.Id,
                     Status = DiagnosticStatus.Open,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    CarModel = dto.CarModel,
+                    CarBrand = dto.CarBrand,
                 };
 
                 var created = await _diagnosticRepository.AddAsync(diagnostic);

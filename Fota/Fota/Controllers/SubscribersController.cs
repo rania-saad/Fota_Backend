@@ -9,7 +9,7 @@ using SharedProjectDTOs.Subscribers;
 
 namespace Fota.AWebAPI.Controllers
 {
-    [Authorize(Roles = "ADMIN,DEVELOPER")]
+    //[Authorize(Roles = "ADMIN,DEVELOPER")]
 
     [ApiController]
     [Route("api/[controller]")]
@@ -175,7 +175,8 @@ namespace Fota.AWebAPI.Controllers
                     Email = dto.Email,
                     PhoneNumber = dto.PhoneNumber,
                     IsActive = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    location=dto.location
                 };
 
                 var created = await _subscriberRepository.AddAsync(subscriber);

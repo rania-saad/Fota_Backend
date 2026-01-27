@@ -158,7 +158,7 @@ namespace Fota.BusinessLayer.Repositories
                 return null;
             }
 
-            if (message.Status != BaseMessageStatus.Approved)
+            if (message.Status != BaseMessageStatus.Pending)
             {
                 _logger.LogWarning("❌ Message {MessageId} status is {Status}, must be Approved",
                     messageId, message.Status);

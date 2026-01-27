@@ -11,5 +11,6 @@ namespace Fota.BusinessLayer.Interfaces
     {
         Task<IEnumerable<Topic>> GetActiveTopicsAsync();
         Task<IEnumerable<Topic>> GetByTeamAsync(int teamId);
+        Task<Topic?> GetByNameAsync(string name);
     }
 }

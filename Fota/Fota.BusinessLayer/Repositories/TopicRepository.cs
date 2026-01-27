@@ -73,5 +73,12 @@ namespace Fota.DataLayer.Repositories.Implementation
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<Topic?> GetByNameAsync(string name)
+        {
+            return await _dbSet
+                .FirstOrDefaultAsync(t => t.Name == name && !t.IsDeleted);
+        }
+
     }
 }
