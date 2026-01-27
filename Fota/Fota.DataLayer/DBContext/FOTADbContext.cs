@@ -1,9 +1,10 @@
-﻿using Fota.DataLayer.Models;
+﻿using Fota.DataLayer.Enum;
+using Fota.DataLayer.Models;
 using Fota.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
-using Fota.DataLayer.Enum;
 
 namespace Fota.DataLayer.DBContext
 {
@@ -111,7 +112,20 @@ namespace Fota.DataLayer.DBContext
                 .OnDelete(DeleteBehavior.NoAction);
 
             // ==================== SEED DATA ====================
-
+            modelBuilder.Entity<IdentityRole>().HasData(
+    new IdentityRole
+    {
+        Id = "role-admin", // اختاري أي ID ثابت
+        Name = "Admin",
+        NormalizedName = "ADMIN"
+    },
+    new IdentityRole
+    {
+        Id = "role-developer",
+        Name = "Developer",
+        NormalizedName = "DEVELOPER"
+    }
+);
             // Admins - Realistic data
             modelBuilder.Entity<Admin>().HasData(
                 new Admin
@@ -283,6 +297,7 @@ namespace Fota.DataLayer.DBContext
                     Email = "fleet.cairo@toyota-eg.com",
                     PhoneNumber = "+201234567895",
                     IsActive = true,
+                    location=" Egypt , Menoufya",
                     CreatedAt = new DateTime(2024, 4, 1, 8, 0, 0)
                 },
                 new Subscriber
@@ -292,6 +307,8 @@ namespace Fota.DataLayer.DBContext
                     Email = "test.center@bmw-eg.com",
                     PhoneNumber = "+201234567896",
                     IsActive = true,
+                    location = " Egypt , Menoufya",
+
                     CreatedAt = new DateTime(2024, 4, 1, 8, 0, 0)
                 }
             );
@@ -380,6 +397,8 @@ namespace Fota.DataLayer.DBContext
                     SubscriberId = 2,
                     AssignedByAdminId = 1,
                     AssignedToDeveloperId = 2,
+                    CarBrand ="Kia",
+                    CarModel="Sportage",
                     CreatedAt = new DateTime(2024, 5, 20, 8, 30, 0)
                 }
             );

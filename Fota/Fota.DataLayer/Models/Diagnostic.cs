@@ -35,6 +35,9 @@ namespace Fota.DataLayer.Models
         [Required]
         public int SubscriberId { get; set; }
 
+        public string CarModel {  get; set; }
+
+        public string CarBrand {  get; set; }
         public int? TopicId { get; set; }
         public int? AssignedByAdminId { get; set; }
         public int? AssignedToDeveloperId { get; set; }

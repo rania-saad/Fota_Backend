@@ -18,7 +18,10 @@ using System.ComponentModel.DataAnnotations;
 
             [MaxLength(20)]
             public string? PhoneNumber { get; set; }
-        }
+
+            [Required]
+            public string location { get; set; }
+    }
 
         public class SubscriberGetDto
         {
@@ -27,7 +30,8 @@ using System.ComponentModel.DataAnnotations;
             public string Email { get; set; } = null!;
             public string? PhoneNumber { get; set; }
             public bool IsActive { get; set; }
-            public List<int> TopicSubscriptionIds { get; set; } = new List<int>();
+           public string location { get; set; }
+           public List<int> TopicSubscriptionIds { get; set; } = new List<int>();
             public List<int> DiagnosticIds { get; set; } = new List<int>();
             public List<int> MessageDeliveryIds { get; set; } = new List<int>();
         }
@@ -43,7 +47,8 @@ using System.ComponentModel.DataAnnotations;
 
             [Required]
             public bool IsActive { get; set; }
-        }
+            public string location { get; set; }
+    }
 
         public class SubscriberTopicDto
         {

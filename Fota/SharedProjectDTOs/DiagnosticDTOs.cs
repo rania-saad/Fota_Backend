@@ -23,13 +23,17 @@ namespace SharedProjectDTOs.DiagnosticDTOs
             public string? Description { get; set; }
 
             [Required]
-            [MaxLength(50)]
+            //[MaxLength(50)]
             public DiagnosticPriority Priority { get; set; } = DiagnosticPriority.Medium;
 
             [Required]
             public int SubscriberId { get; set; }
 
-            public int? TopicId { get; set; }
+            public string TopicName { get; set; }
+
+            public string CarModel { get; set; }
+
+            public string CarBrand { get; set; }
         }
 
         // Get DTO - Full details
@@ -52,6 +56,9 @@ namespace SharedProjectDTOs.DiagnosticDTOs
             public string? AssignedToDeveloperName { get; set; }
             public DateTime CreatedAt { get; set; }
             public DateTime? UpdatedAt { get; set; }
+            public string CarModel { get; set; }
+
+            public string CarBrand { get; set; }
             public List<int> SolutionIds { get; set; } = new List<int>();
         }
 
@@ -64,6 +71,9 @@ namespace SharedProjectDTOs.DiagnosticDTOs
             public DiagnosticStatus Status { get; set; }
             public string? SubscriberName { get; set; }
             public string? TopicName { get; set; }
+            public string CarModel { get; set; }
+
+            public string CarBrand { get; set; }
             public string? AssignedToDeveloperName { get; set; }
             public DateTime CreatedAt { get; set; }
         }
@@ -79,6 +89,9 @@ namespace SharedProjectDTOs.DiagnosticDTOs
 
             [MaxLength(50)]
             public DiagnosticPriority Priority { get; set; }
+            public string CarModel { get; set; }
+
+            public string CarBrand { get; set; }
 
             public int? TopicId { get; set; }
         }

@@ -19,6 +19,9 @@ namespace Fota.Models
         [EmailAddress]
         public string Email { get; set; } = null!;
 
+        [Required]
+        public string location { get; set; }
+
         [MaxLength(20)]
         public string? PhoneNumber { get; set; }
 
