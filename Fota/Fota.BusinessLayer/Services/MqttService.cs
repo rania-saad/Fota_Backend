@@ -93,7 +93,7 @@ namespace Fota.Services
         /// <param name="topic">MQTT topic name</param>
         /// <param name="payloadBase64">Base64 encoded hex file content</param>
         /// <param name="chunkSize">Size of each chunk in bytes (default 256)</param>
-        public async Task PublishAsync(string topic, string payloadBase64, int chunkSize = 256)
+        public async Task PublishAsync(string topic, string payloadBase64, int chunkSize = 64)
         {
             if (!_client.IsConnected)
             {
