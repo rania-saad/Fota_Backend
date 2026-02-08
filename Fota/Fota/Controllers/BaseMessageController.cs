@@ -642,7 +642,7 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// </summary>
         private bool IsAdmin()
         {
-            var isAdmin = User.IsInRole("ADMIN");
+            var isAdmin = User.IsInRole("Admin");
             _logger.LogInformation("👤 User is admin: {IsAdmin}", isAdmin);
             return isAdmin;
         }
@@ -1092,11 +1092,7 @@ namespace StaffAffairs.AWebAPI.Controllers
                     return Forbid(); // 403 Forbidden
                 }
 
-                if (message.Status != BaseMessageStatus.Draft)
-                {
-                    _logger.LogWarning("⚠️ Attempt to update non-draft message {MessageId}", id);
-                    return BadRequest(new { message = "Only draft messages can be updated" });
-                }
+             
 
                 // Update fields
                 if (dto.MessageType != null)
@@ -1306,6 +1302,61 @@ namespace StaffAffairs.AWebAPI.Controllers
         /// <summary>
         /// DELETE: api/BaseMessages/5
         /// </summary>
+        //    [HttpDelete("{id}")]
+        //    public async Task<ActionResult> DeleteBaseMessage(int id)
+        //    {
+        //        try
+        //        {
+        //            var developerId = await GetCurrentDeveloperIdAsync();
+        //            _logger.LogInformation("🗑️ Developer {DeveloperId} attempting to delete message {MessageId}",
+        //                developerId, id);
+
+        //            var message = await _baseMessageRepository.GetByIdAsync(id);
+
+        //            if (message == null)
+        //            {
+        //                _logger.LogWarning("⚠️ Message {MessageId} not found", id);
+        //                return NotFound(new { message = $"BaseMessage with ID {id} not found" });
+        //            }
+
+        //            if (!IsAdmin() && message.UploaderId != developerId)
+        //            {
+        //                _logger.LogWarning(
+        //                    "🔒 User {DeveloperId} tried to delete message {MessageId} but is not Admin or Owner",
+        //                    developerId, id
+        //                );
+        //                return Forbid();
+        //            }
+
+
+
+        //            var deleted = await _baseMessageRepository.DeleteAsync(id);
+
+        //            if (!deleted)
+        //            {
+        //                _logger.LogWarning("⚠️ Failed to delete message {MessageId}", id);
+        //                return NotFound(new { message = $"Failed to delete message with ID {id}" });
+        //            }
+
+        //            _logger.LogInformation("✅ Message {MessageId} deleted successfully by {DeveloperId}",
+        //                id, developerId);
+
+        //            return NoContent();
+        //        }
+        //        catch (UnauthorizedAccessException ex)
+        //        {
+        //            return Unauthorized(new { message = ex.Message });
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            _logger.LogError(ex, "❌ Error deleting base message {Id}", id);
+        //            return StatusCode(StatusCodes.Status500InternalServerError,
+        //                new { message = "An unexpected error occurred" });
+        //        }
+        //    }
+        //}
+
+        /// DELETE: api/BaseMessages/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBaseMessage(int id)
         {
@@ -1323,11 +1374,13 @@ namespace StaffAffairs.AWebAPI.Controllers
                     return NotFound(new { message = $"BaseMessage with ID {id} not found" });
                 }
 
-                // ✅ التحقق من الصلاحيات - فقط صاحب الـ message أو Admin
+                // ✅ التحقق من الصلاحيات - Admin أو صاحب الرسالة
                 if (!IsAdmin() && message.UploaderId != developerId)
                 {
-                    _logger.LogWarning("🔒 Developer {DeveloperId} tried to delete message {MessageId} owned by {OwnerId}",
-                        developerId, id, message.UploaderId);
+                    _logger.LogWarning(
+                        "🔒 User {DeveloperId} tried to delete message {MessageId} but is not Admin or Owner",
+                        developerId, id
+                    );
                     return Forbid();
                 }
 
@@ -1355,5 +1408,5 @@ namespace StaffAffairs.AWebAPI.Controllers
                     new { message = "An unexpected error occurred" });
             }
         }
-    }
-}
+
+    } }

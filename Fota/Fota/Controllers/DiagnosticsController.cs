@@ -285,7 +285,7 @@ namespace StaffAffairs.AWebAPI.Controllers
 
         // GET: api/Diagnostics/my
         [HttpGet("my")]
-        [Authorize(Roles = "ADMIN,DEVELOPER")]
+        [Authorize(Roles = "Admin,DEVELOPER")]
         public async Task<ActionResult<IEnumerable<DiagnosticListDto>>> GetMyDiagnostics()
         {
             try
